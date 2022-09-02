@@ -1,0 +1,36 @@
+{
+  "name": "js-interview",
+  "version": "1.0.0",
+  "description": "Test assignment for JS developers",
+  "author": "Pavel Kinev",
+  "license": "UNLICENSED",
+  "main": "index.js",
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "scripts": {
+    "up": "docker-compose up",
+    "stop": "docker-compose down",
+    "dev": "next dev",
+    "setup": "npm exec prisma db push ; npm exec prisma db seed",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.3.1",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@prisma/client": "^4.3.0",
+    "@tanstack/react-query": "^4.2.3",
+    "framer-motion": "^6.5.1",
+    "joi": "^17.6.0",
+    "next": "^12.2.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.34.2"
+  },
+  "devDependencies": {
+    "prisma": "^4.3.0"
+  }
+}

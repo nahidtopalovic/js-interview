@@ -13,8 +13,8 @@
 #### Actions:
 - Fix all console errors in the browser
 - Fix item saving
-- Change the header on the page so it makes sense
-- Move initial request to the client using `react-query`, use chakra skeleton or spinner while it loads
+- Change the header on the page so the count reflects the actual number of items
+- Move initial request to the client using `react-query`, show loading screen while it loads
 - Make text in the TODO item required, should throw an error on the server if empty
 - Make whole item clickable to toggle a checkbox
 - Update `/api/stats` so it returns real data from the database instead of hardcoded, do all aggregations in db using raw SQL

@@ -1,6 +1,6 @@
+import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useForm, useFieldArray, useFormContext, FormProvider } from 'react-hook-form'
-import { Center, Box, FormControl, FormLabel, Input, Button, Heading, Text } from '@chakra-ui/react'
+import { Center, Box, FormControl, FormLabel, Input, Button, Heading } from '@chakra-ui/react'
 
 const Card = ({ children, ...props }) => (
   <Box
@@ -18,26 +18,23 @@ const Card = ({ children, ...props }) => (
   </Box>
 )
 
-const TodoItem = ({ index, onDelete }) => {
-  const { register } = useFormContext()
-  const prefix = `items.${index}`
+const TodoItem = ({ text, id, isCompleted, onDelete }) => {
   return (
     <Card>
-      <FormControl id={`${prefix}.isCompleted`} display="flex" alignItems="center" outlineWidth={0}>
-        <input type="checkbox" {...register(`${prefix}.isCompleted`)} />
+      <FormControl  display="flex" alignItems="center">
+        <input type="checkbox" value={isCompleted}/>
         <FormLabel mb={0} ml={3} flexGrow={1}>
-              <Input w="full" type="text" {...register(`${prefix}.text`)} border="none" />
+              <Input w="full" type="text" border="none"  value={text} />
         </FormLabel>
-        <Button colorScheme="red" variant="ghost" size="sm" onClick={() => onDelete(index)}>&times;</Button>
+        <Button colorScheme="red" variant="ghost" size="sm" onClick={() => onDelete(id)}>&times;</Button>
       </FormControl>
     </Card>
   )
 }
 
 const Main = ({ todoItems }) => {
-  const methods = useForm({ defaultValues: { items: todoItems } })
-  const { fields, append, remove } = useFieldArray({ control: methods.control, name: 'items' })
-  const { data: { stats } = {} } = useQuery(['stats'], () => fetch('/api/stats').then((res) => res.json()))
+  const [items, setItems] = useState(todoItems)
+  const { data: { stats } = {} } = useQuery( ['stats'],() => fetch('/api/stats').then((res) => res.json()), )
   const { mutate } = useMutation(
     data => fetch('/api/todos', { method: 'PUT', body: data }).then(({ status }) => {
         if (!/2\d\d/.test(status)) throw new Error()
@@ -49,23 +46,21 @@ const Main = ({ todoItems }) => {
     }
   )
 
-  const onSubmit = ({ items }) => mutate({ items: items.map(item => ({ text: item.text, isCompleted: item.isCompleted })) })
-  const onAdd = () => append({ text: '' })
-  const onDelete = index => remove(index)
+  const onSubmit = () => mutate({ items: items.map(item => ({ text: item.text, isCompleted: item.isCompleted })) })
+  const onAdd = () => setItems([...items, { text: '', isCompleted: false }])
+  const onDelete = id => setItems(items.filter((item) => item.id !== id))
+
 
   return (
-    <FormProvider {...methods}>
-      <form
-      onSubmit={methods.handleSubmit(onSubmit)}>
+      <form onSubmit={onSubmit}>
         <Center bg="orange.100" h="100vh" w="100vw" display="flex" flexDir="column">
             <Heading as="h2" size="lg" mb={4}>Total: {stats?.total}, completed: {stats?.completed}</Heading>
-          {fields.map((item, index) => <><TodoItem key={item.ld} {...item} index={index} onDelete={onDelete} /></>)}
+          {items.map((item, index) => <><TodoItem key={item.ld} {...item} index={index} onDelete={onDelete} /></>)}
             <Card justifyContent="space-between"><Button colorScheme="orange" onClick={onAdd}>Add</Button>
           <Button colorScheme="teal" type="submit">Save</Button>
             </Card>
         </Center>
-        </form>
-    </FormProvider>
+      </form>
   )
 }
 
